@@ -11,7 +11,7 @@
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400">{{ producto.nombre }} - {{ producto.codigo }}</p>
         </div>
-        <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button @click="$emit('close')" aria-label="Cerrar modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>

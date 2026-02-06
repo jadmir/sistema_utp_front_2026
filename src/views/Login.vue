@@ -65,6 +65,7 @@
               <button
                 type="button"
                 @click="showPassword = !showPassword"
+                :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
                 <svg v-if="!showPassword" class="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +89,7 @@
               />
               <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Recordar sesión</span>
             </label>
-            <button type="button" @click.prevent="() => {}" class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium">
+            <button type="button" @click.prevent="() => {}" aria-label="Recuperar contraseña" class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium">
               ¿Olvidaste tu contraseña?
             </button>
           </div>
@@ -168,6 +169,8 @@ const handleLogin = async (event) => {
     const errorMsg = error.response?.data?.message || 'Error al iniciar sesión'
     const errorDetails = error.response?.data?.errors
 
+    // Limpiar solo la contraseña por seguridad (mantener el email para mejor UX)
+    form.value.password = ''
     
     // Mostrar error en el formulario
     errorMessage.value = errorMsg

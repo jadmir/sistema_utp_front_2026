@@ -199,12 +199,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { usuariosService, rolesService } from '../services/usuarios'
 import { useAlert } from '../composables/useAlert'
-import UsuarioModal from '../components/UsuarioModal.vue'
-import AsignarPermisosUsuarioModal from '../components/AsignarPermisosUsuarioModal.vue'
+// Lazy loading de modales para mejorar performance
+const UsuarioModal = defineAsyncComponent(() => import('../components/UsuarioModal.vue'))
+const AsignarPermisosUsuarioModal = defineAsyncComponent(() => import('../components/AsignarPermisosUsuarioModal.vue'))
 
 const authStore = useAuthStore()
 const { success, error, confirm } = useAlert()

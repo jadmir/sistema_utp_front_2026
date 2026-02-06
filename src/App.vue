@@ -1,6 +1,15 @@
 <template>
   <MainLayout v-if="!isLoginPage">
-    <router-view />
+    <Suspense>
+      <template #default>
+        <router-view />
+      </template>
+      <template #fallback>
+        <div class="flex items-center justify-center min-h-screen">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+        </div>
+      </template>
+    </Suspense>
   </MainLayout>
   
   <div v-else>

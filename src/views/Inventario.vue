@@ -95,15 +95,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, h } from 'vue'
+import { ref, computed, onMounted, watch, h, defineAsyncComponent } from 'vue'
 import { productsService } from '../services/products'
-import ProductosTab from '../components/inventory/ProductosTab.vue'
-import TiposStockTab from '../components/inventory/TiposStockTab.vue'
-import SeccionesTab from '../components/inventory/SeccionesTab.vue'
-import AreasTab from '../components/inventory/AreasTab.vue'
-import MovimientosTab from '../components/inventory/MovimientosTab.vue'
-import ReportesTab from '../components/inventory/ReportesTab.vue'
-import PlantillasTab from '../components/inventory/PlantillasTab.vue'
+// Lazy loading de componentes pesados para mejorar performance
+const ProductosTab = defineAsyncComponent(() => import('../components/inventory/ProductosTab.vue'))
+const TiposStockTab = defineAsyncComponent(() => import('../components/inventory/TiposStockTab.vue'))
+const SeccionesTab = defineAsyncComponent(() => import('../components/inventory/SeccionesTab.vue'))
+const AreasTab = defineAsyncComponent(() => import('../components/inventory/AreasTab.vue'))
+const MovimientosTab = defineAsyncComponent(() => import('../components/inventory/MovimientosTab.vue'))
+const ReportesTab = defineAsyncComponent(() => import('../components/inventory/ReportesTab.vue'))
+const PlantillasTab = defineAsyncComponent(() => import('../components/inventory/PlantillasTab.vue'))
 import { usePermissions } from '../composables/usePermissions'
 import { logger } from '../utils/logger'
 

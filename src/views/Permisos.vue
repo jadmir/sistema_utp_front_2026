@@ -127,11 +127,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { permisosService } from '../services/permisos'
 import { useAlert } from '../composables/useAlert'
-import PermisoModal from '../components/PermisoModal.vue'
+// Lazy loading de modal para mejorar performance
+const PermisoModal = defineAsyncComponent(() => import('../components/PermisoModal.vue'))
 
 const authStore = useAuthStore()
 const { showAlert, confirm } = useAlert()
