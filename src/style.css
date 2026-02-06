@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #dc2626;
+  --color-primary-50: #fee2e2;
+  --color-primary-100: #fecaca;
+  --color-primary-200: #fca5a5;
+  --color-primary-300: #f87171;
+  --color-primary-400: #ef4444;
+  --color-primary-500: #dc2626;
+  --color-primary-600: #b91c1c;
+  --color-primary-700: #991b1b;
+  --color-primary-800: #7f1d1d;
+  --color-primary-900: #450a0a;
+
+  --color-dark: #000000;
+  --color-dark-50: #f5f5f5;
+  --color-dark-100: #e5e5e5;
+  --color-dark-200: #d4d4d4;
+  --color-dark-300: #a3a3a3;
+  --color-dark-400: #737373;
+  --color-dark-500: #525252;
+  --color-dark-600: #404040;
+  --color-dark-700: #262626;
+  --color-dark-800: #171717;
+  --color-dark-900: #0a0a0a;
+  --color-dark-950: #000000;
+}
+
+/* Habilitar modo oscuro con selector de clase */
+@variant dark (&:where(.dark, .dark *));
