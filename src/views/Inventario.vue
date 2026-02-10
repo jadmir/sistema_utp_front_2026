@@ -57,7 +57,7 @@
       <div class="p-4 sm:p-6">
         <!-- Tab Productos -->
         <div v-show="activeTab === 'productos'">
-          <ProductosTab ref="productosTabRef" @alerts-updated="loadStockAlerts" />
+          <ProductosTab ref="productosTabRef" @alerts-updated="loadStockAlerts" @movimiento-created="handleMovimientoCreated" />
         </div>
 
         <!-- Tab Categorías -->
@@ -75,9 +75,14 @@
           <AreasTab />
         </div>
 
+        <!-- Tab Depósitos -->
+        <div v-show="activeTab === 'depositos'">
+          <DepositosTab />
+        </div>
+
         <!-- Tab Movimientos -->
         <div v-show="activeTab === 'movimientos'">
-          <MovimientosTab />
+          <MovimientosTab ref="movimientosTabRef" />
         </div>
 
         <!-- Tab Reportes -->
@@ -87,7 +92,7 @@
 
         <!-- Tab Plantillas de Entrega -->
         <div v-show="activeTab === 'plantillas'">
-          <PlantillasTab />
+          <PlantillasTab @movimiento-created="handleMovimientoCreated" />
         </div>
       </div>
     </div>
@@ -102,6 +107,7 @@ const ProductosTab = defineAsyncComponent(() => import('../components/inventory/
 const TiposStockTab = defineAsyncComponent(() => import('../components/inventory/TiposStockTab.vue'))
 const SeccionesTab = defineAsyncComponent(() => import('../components/inventory/SeccionesTab.vue'))
 const AreasTab = defineAsyncComponent(() => import('../components/inventory/AreasTab.vue'))
+const DepositosTab = defineAsyncComponent(() => import('../components/inventory/DepositosTab.vue'))
 const MovimientosTab = defineAsyncComponent(() => import('../components/inventory/MovimientosTab.vue'))
 const ReportesTab = defineAsyncComponent(() => import('../components/inventory/ReportesTab.vue'))
 const PlantillasTab = defineAsyncComponent(() => import('../components/inventory/PlantillasTab.vue'))
@@ -111,6 +117,7 @@ import { logger } from '../utils/logger'
 const activeTab = ref('productos')
 const stockAlerts = ref(0)
 const productosTabRef = ref(null)
+const movimientosTabRef = ref(null)
 const { hasPermission, isAdmin } = usePermissions()
 
 const tabs = computed(() => {
@@ -146,6 +153,14 @@ const tabs = computed(() => {
       icon: () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
         h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }),
         h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M15 11a3 3 0 11-6 0 3 3 0 016 0z' })
+      ])
+    },
+    { 
+      id: 'depositos', 
+      name: 'Depósitos',
+      permission: 'inventario.ver',
+      icon: () => h('svg', { class: 'w-5 h-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+        h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z' })
       ])
     },
     { 
@@ -209,6 +224,13 @@ const verStockBajo = () => {
   // Activar el filtro de stock bajo en ProductosTab
   if (productosTabRef.value) {
     productosTabRef.value.activarFiltroStockBajo()
+  }
+}
+
+const handleMovimientoCreated = () => {
+  // Actualizar el tab de movimientos cuando se crea un movimiento
+  if (movimientosTabRef.value) {
+    movimientosTabRef.value.refresh()
   }
 }
 

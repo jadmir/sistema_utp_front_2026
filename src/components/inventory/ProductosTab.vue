@@ -112,14 +112,14 @@
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Código</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nombre</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Código</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Producto</th>
               <th class="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Sección</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stock Actual</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stock</th>
               <th class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stock Mínimo</th>
-              <th class="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ubicación</th>
+              <th class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Depósito / Ubicación</th>
               <th class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Vencimiento</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
             </tr>
           </thead>
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -135,23 +135,113 @@
               <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No se encontraron productos</td>
             </tr>
             <tr v-else v-for="producto in paginatedProductos" :key="producto.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-4 py-3 text-sm font-mono text-gray-900 dark:text-gray-100">{{ producto.codigo }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">{{ producto.nombre }}</td>
+              <td class="px-3 py-3 text-xs font-mono text-gray-900 dark:text-gray-100">{{ producto.codigo }}</td>
+              <td class="px-3 py-4">
+                <div class="flex flex-col gap-2">
+                  <!-- Nombre del producto -->
+                  <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ producto.nombre }}</span>
+                  
+                  <!-- Info adicional visible solo en móvil -->
+                  <div class="md:hidden space-y-1.5">
+                    <!-- Sección -->
+                    <div v-if="producto.section?.nombre" class="flex items-center gap-1.5 text-xs">
+                      <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-md font-medium">
+                        {{ producto.section.nombre }}
+                      </span>
+                    </div>
+                    
+                    <!-- Stock mínimo -->
+                    <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                      <span>Mínimo: <span class="font-medium">{{ producto.stock_minimo }}</span></span>
+                    </div>
+                    
+                    <!-- Depósito y Ubicación -->
+                    <div v-if="producto.deposito?.nombre || producto.ubicacion" class="space-y-1">
+                      <div v-if="producto.deposito?.nombre" class="flex items-start gap-1.5 text-xs">
+                        <svg class="w-3.5 h-3.5 mt-0.5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                        </svg>
+                        <span class="text-blue-600 dark:text-blue-400 font-medium leading-tight">{{ producto.deposito.nombre }}</span>
+                      </div>
+                      <div v-if="producto.ubicacion" class="flex items-center gap-1.5 text-xs ml-5">
+                        <svg class="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="text-gray-600 dark:text-gray-400">{{ producto.ubicacion }}</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Vencimiento -->
+                    <div v-if="producto.tiene_vencimiento && producto.fecha_vencimiento" class="flex items-center gap-1.5">
+                      <span 
+                        :class="[
+                          'px-2 py-1 rounded-md text-xs font-medium inline-flex items-center gap-1',
+                          getVencimientoClass(producto.fecha_vencimiento)
+                        ]"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {{ formatDate(producto.fecha_vencimiento) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
               <td class="hidden sm:table-cell px-4 py-3 text-sm">
                 <span class="text-gray-600 dark:text-gray-400">{{ producto.section?.nombre }}</span>
               </td>
-              <td class="px-4 py-3 text-sm">
-                <span 
-                  :class="[
-                    'font-semibold',
-                    producto.stock_actual <= producto.stock_minimo ? 'text-red-600' : 'text-green-600'
-                  ]"
-                >
-                  {{ producto.stock_actual }} {{ producto.unidad_medida }}
-                </span>
+              <td class="px-3 py-4 text-sm">
+                <div class="flex flex-col items-start gap-1">
+                  <span 
+                    :class="[
+                      'font-bold text-base',
+                      producto.stock_actual <= producto.stock_minimo ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+                    ]"
+                  >
+                    {{ producto.stock_actual }}
+                  </span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 uppercase">
+                    {{ producto.unidad_medida }}
+                  </span>
+                </div>
               </td>
               <td class="hidden md:table-cell px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ producto.stock_minimo }}</td>
-              <td class="hidden lg:table-cell px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ producto.ubicacion || '-' }}</td>
+              <td class="hidden md:table-cell px-4 py-3 text-sm">
+                <div class="flex flex-col gap-0.5">
+                  <!-- Depósito -->
+                  <span v-if="producto.deposito?.nombre" class="text-gray-900 dark:text-gray-100 font-medium flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                    </svg>
+                    {{ producto.deposito.nombre }}
+                  </span>
+                  <!-- Ubicación específica -->
+                  <span v-if="producto.ubicacion" class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 ml-4">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {{ producto.ubicacion }}
+                  </span>
+                  <!-- Solo ubicación sin depósito -->
+                  <span v-else-if="!producto.deposito?.nombre && producto.ubicacion" class="text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {{ producto.ubicacion }}
+                  </span>
+                  <!-- Sin información -->
+                  <span v-if="!producto.deposito?.nombre && !producto.ubicacion" class="text-gray-400 dark:text-gray-500">
+                    Sin ubicación
+                  </span>
+                </div>
+              </td>
               <td class="hidden md:table-cell px-4 py-3 text-sm">
                 <span v-if="producto.tiene_vencimiento && producto.fecha_vencimiento" 
                   :class="[
@@ -163,54 +253,54 @@
                 </span>
                 <span v-else class="text-gray-400 dark:text-gray-500">-</span>
               </td>
-              <td class="px-4 py-3 text-sm">
-                <div class="flex gap-2">
+              <td class="px-2 py-3 text-sm">
+                <div class="flex gap-1 md:gap-2">
                   <button
                     v-if="canEntry"
                     @click="openEntryModal(producto)"
-                    class="text-green-600 hover:text-green-900"
+                    class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 p-1"
                     title="Entrada"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
                     </svg>
                   </button>
                   <button
                     v-if="canExit"
                     @click="openExitModal(producto)"
-                    class="text-orange-600 hover:text-orange-900"
+                    class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300 p-1"
                     title="Salida"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
                     </svg>
                   </button>
                   <button
                     v-if="canEdit"
                     @click="openEditModal(producto)"
-                    class="text-blue-600 hover:text-blue-900"
+                    class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1"
                     title="Editar"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   <button
                     @click="viewHistory(producto)"
-                    class="text-gray-600 hover:text-gray-900"
+                    class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 p-1"
                     title="Historial"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </button>
                   <button
                     v-if="canDelete"
                     @click="deleteProducto(producto)"
-                    class="text-red-600 hover:text-red-900"
+                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1"
                     title="Eliminar"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
@@ -321,6 +411,7 @@ import { productsService } from '../../services/products'
 import SkeletonLoader from '../SkeletonLoader.vue'
 import { stockTypesService } from '../../services/stockTypes'
 import { sectionsService } from '../../services/sections'
+import { depositosService } from '../../services/depositos'
 import { useAlert } from '../../composables/useAlert'
 import { useCache } from '../../composables/useCache'
 import ProductoModal from './ProductoModal.vue'
@@ -328,7 +419,7 @@ import MovimientoModal from './MovimientoModal.vue'
 import HistorialModal from './HistorialModal.vue'
 import MovimientosMasivosModal from './MovimientosMasivosModal.vue'
 
-const emit = defineEmits(['alerts-updated'])
+const emit = defineEmits(['alerts-updated', 'movimiento-created'])
 
 const authStore = useAuthStore()
 const { success, error, confirm } = useAlert()
@@ -338,6 +429,7 @@ const productos = ref([])
 const allProductos = ref([])
 const stockTypes = ref([])
 const sections = ref([])
+const depositos = ref([])
 const loading = ref(false)
 const searchQuery = ref('')
 
@@ -455,6 +547,7 @@ const loadProductos = async (forceRefresh = false) => {
       search: searchQuery.value || undefined,
       order_by: 'created_at',
       order_dir: 'desc'
+      // No incluir 'with' porque el backend no lo procesa, haré el match en el frontend
     }
     
     console.log('🔍 PARÁMETROS ENVIADOS:', params)
@@ -485,6 +578,18 @@ const loadProductos = async (forceRefresh = false) => {
         // Ordenar por ID descendente
         data.sort((a, b) => b.id - a.id)
         
+        // Asignar depósitos manualmente desde el array cargado
+        data = data.map(producto => {
+          if (producto.deposito_id && depositos.value.length > 0) {
+            const deposito = depositos.value.find(d => d.id === producto.deposito_id)
+            return {
+              ...producto,
+              deposito: deposito || null
+            }
+          }
+          return producto
+        })
+        
         return data
       },
       params,
@@ -493,6 +598,17 @@ const loadProductos = async (forceRefresh = false) => {
     )
     
     productos.value = allData
+    
+    // Debug: Verificar si los depósitos se están cargando
+    if (allData.length > 0) {
+      console.log('🏢 PRIMER PRODUCTO CON DEPOSITO:', {
+        codigo: allData[0].codigo,
+        nombre: allData[0].nombre,
+        deposito_id: allData[0].deposito_id,
+        deposito: allData[0].deposito,
+        ubicacion: allData[0].ubicacion
+      })
+    }
     
     // Si hay filtro de próximos a vencer, aplicarlo
     if (filters.value.proximos_vencer) {
@@ -531,7 +647,8 @@ const loadStockTypes = async () => {
     const response = await stockTypesService.getAll()
     stockTypes.value = response.data.data
   } catch (err) {
-    console.error('Error cargando tipos de stock:', err)
+    console.warn('⚠️ No se pudieron cargar tipos de stock:', err.message)
+    stockTypes.value = [] // Continuar con array vacío
   }
 }
 
@@ -540,7 +657,19 @@ const loadSections = async () => {
     const response = await sectionsService.getAll()
     sections.value = response.data.data
   } catch (err) {
-    console.error('Error cargando secciones:', err)
+    console.warn('⚠️ No se pudieron cargar secciones:', err.message)
+    sections.value = [] // Continuar con array vacío
+  }
+}
+
+const loadDepositos = async () => {
+  try {
+    const response = await depositosService.getAll()
+    depositos.value = response.data.data || []
+    console.log('🏢 DEPÓSITOS CARGADOS:', depositos.value.length)
+  } catch (err) {
+    console.warn('⚠️ No se pudieron cargar depósitos:', err.message)
+    depositos.value = []
   }
 }
 
@@ -711,6 +840,8 @@ const handleMovimiento = async () => {
   // Invalidar caché ya que el stock cambió
   invalidateCache('productos')
   await loadProductos(true)
+  // Notificar al padre que hubo un movimiento
+  emit('movimiento-created')
 }
 
 const viewHistory = (producto) => {
@@ -750,6 +881,9 @@ const handleMovimientosMasivos = async (result) => {
   if (result.alertas_stock_bajo && result.alertas_stock_bajo.length > 0) {
     emit('alerts-updated')
   }
+  
+  // Notificar al padre que hubo movimientos
+  emit('movimiento-created')
 }
 
 const deleteProducto = async (producto) => {
@@ -766,10 +900,13 @@ const deleteProducto = async (producto) => {
   }
 }
 
-onMounted(() => {
-  loadProductos()
-  loadStockTypes()
-  loadSections()
+onMounted(async () => {
+  // Cargar depósitos primero, luego productos para poder hacer el match
+  await loadDepositos()
+  await loadStockTypes()
+  await loadSections()
+  // Forzar refresh para cargar productos con relación de depósito
+  loadProductos(true)
 })
 
 // Guardar filtros cuando cambien

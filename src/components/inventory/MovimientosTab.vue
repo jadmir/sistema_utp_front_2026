@@ -287,4 +287,9 @@ onMounted(() => {
   loadAreas()
   loadMovimientos()
 })
+
+// Exponer método para refrescar desde el padre
+defineExpose({
+  refresh: loadMovimientos
+})
 </script>

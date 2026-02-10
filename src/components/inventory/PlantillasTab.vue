@@ -196,6 +196,7 @@ import EjecutarPlantillaModal from './EjecutarPlantillaModal.vue'
 
 const authStore = useAuthStore()
 const { success, error, confirm } = useAlert()
+const emit = defineEmits(['movimiento-created'])
 
 const plantillas = ref([])
 const areas = ref([])
@@ -298,6 +299,8 @@ const handleEjecutar = async (data) => {
     
     closeEjecutarModal()
     await loadPlantillas()
+    // Notificar al padre que hubo movimientos
+    emit('movimiento-created')
   } catch (err) {
     if (err.response?.data?.errores) {
       // Errores de stock insuficiente

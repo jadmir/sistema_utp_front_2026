@@ -13,15 +13,15 @@
       </div>
 
       <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto">
-        <div class="p-6 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-3 sm:p-6 space-y-3 sm:space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Artículo *</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Artículo *</label>
             <select
               v-model="form.section_id"
               @change="onSectionChange"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="">Seleccionar sección</option>
               <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">
@@ -31,12 +31,12 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código</label>
             <input
               v-model="form.codigo"
               type="text"
               readonly
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed"
               :placeholder="loadingCode ? 'Cargando código...' : 'Selecciona una sección'"
             />
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ producto ? 'El código no se puede cambiar' : 'Se genera automáticamente' }}</p>
@@ -44,29 +44,29 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del Producto *</label>
+          <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre del Producto *</label>
           <input
             v-model="form.nombre"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+            class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             placeholder="Lapicero azul Faber Castell"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+          <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
           <textarea
             v-model="form.descripcion"
             rows="2"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+            class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             placeholder="Descripción detallada del producto"
           ></textarea>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Actual *</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Actual *</label>
             <input
               v-model.number="form.stock_actual"
               type="number"
@@ -74,7 +74,7 @@
               required
               :readonly="!!producto"
               :class="[
-                'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500',
+                'w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500',
                 producto ? 'bg-gray-50 dark:bg-gray-900 text-gray-600 dark:text-gray-400 cursor-not-allowed' : 'dark:bg-gray-700 dark:text-white'
               ]"
             />
@@ -82,23 +82,23 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Mínimo *</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Mín. *</label>
             <input
               v-model.number="form.stock_minimo"
               type="number"
               min="0"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Máximo</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Máx.</label>
             <input
               v-model.number="form.stock_maximo"
               type="number"
               min="0"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
         </div>
@@ -116,68 +116,89 @@
             type="date"
             :max="maxDate"
             required
-            class="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-blue-300 dark:border-blue-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <p class="text-xs text-blue-700 dark:text-blue-400 mt-1">
             ¿Cuándo ingresó este stock inicial al almacén?
           </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-3 sm:gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unidad de Medida *</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unidad de Medida *</label>
             <input
               v-model="form.unidad_medida"
               type="text"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
               placeholder="UNIDAD, CAJA, LITRO, etc."
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubicación</label>
-            <input
-              v-model="form.ubicacion"
-              type="text"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
-              placeholder="Estante A-3"
-            />
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Depósito</label>
+            <select
+              v-model="form.deposito_id"
+              class="w-full px-2 sm:px-3 py-2.5 text-xs sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white leading-tight truncate"
+              style="text-overflow: ellipsis;"
+            >
+              <option value="" class="py-2">Sin depósito</option>
+              <option 
+                v-for="deposito in depositos" 
+                :key="deposito.id" 
+                :value="deposito.id"
+                :title="deposito.nombre"
+                class="py-2 text-xs sm:text-sm"
+              >
+                {{ deposito.nombre }}
+              </option>
+            </select>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Selecciona dónde se almacena</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div>
+          <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubicación Específica</label>
+          <input
+            v-model="form.ubicacion"
+            type="text"
+            class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+            placeholder="Estante A-3"
+          />
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
           <label class="flex items-center gap-2 cursor-pointer">
             <input
               v-model="form.tiene_vencimiento"
               type="checkbox"
               class="w-4 h-4 text-red-600 border-gray-300 dark:border-gray-600 rounded focus:ring-red-500 dark:bg-gray-700"
             />
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Tiene fecha de vencimiento</span>
+            <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Tiene fecha de vencimiento</span>
           </label>
 
           <div v-if="form.tiene_vencimiento" class="flex-1">
             <input
               v-model="form.fecha_vencimiento"
               type="date"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              class="w-full px-2 sm:px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
         </div>
         </div>
 
-        <div class="flex justify-end gap-3 p-6 pt-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex-shrink-0">
+        <div class="flex justify-end gap-2 sm:gap-3 p-3 sm:p-6 pt-3 sm:pt-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex-shrink-0">
           <button
             type="button"
             @click="$emit('close')"
-            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-white transition"
+            class="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-white transition"
           >
             Cancelar
           </button>
           <button
             type="submit"
             :disabled="loading"
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 transition-all duration-200"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg font-semibold disabled:opacity-50 transition-all duration-200"
           >
             {{ loading ? 'Guardando...' : 'Guardar' }}
           </button>
@@ -191,6 +212,7 @@
 import { ref, onMounted } from 'vue'
 import { productsService } from '../../services/products'
 import { sectionsService } from '../../services/sections'
+import { depositosService } from '../../services/depositos'
 import { useAlert } from '../../composables/useAlert'
 
 const props = defineProps({
@@ -204,6 +226,7 @@ const emit = defineEmits(['close', 'save'])
 const { success, error } = useAlert()
 const loading = ref(false)
 const loadingCode = ref(false)
+const depositos = ref([])
 
 // Fecha máxima permitida (hoy)
 const maxDate = new Date().toISOString().split('T')[0]
@@ -220,6 +243,7 @@ const form = ref({
   tiene_vencimiento: false,
   fecha_vencimiento: null,
   ubicacion: '',
+  deposito_id: '',
   estado: true,
   fecha_movimiento: new Date().toISOString().split('T')[0] // Fecha de hoy por defecto
 })
@@ -243,6 +267,11 @@ const handleSubmit = async () => {
   loading.value = true
   try {
     const data = { ...form.value }
+    
+    // Convertir deposito_id vacío a null
+    if (!data.deposito_id) {
+      data.deposito_id = null
+    }
     
     // NO enviar el código al crear (se genera en backend)
     if (!props.producto) {
@@ -278,7 +307,21 @@ const handleSubmit = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Cargar depósitos activos (opcional, no bloquea el modal)
+  try {
+    const response = await depositosService.getActivos()
+    // Filtrar "Sin depósito" del backend para evitar duplicados con la opción por defecto
+    const allDepositos = response.data.data || []
+    depositos.value = allDepositos.filter(d => 
+      d.nombre && d.nombre.toLowerCase() !== 'sin depósito' && d.nombre.toLowerCase() !== 'sin deposito'
+    )
+  } catch (err) {
+    console.warn('⚠️ No se pudieron cargar depósitos:', err.message)
+    // No mostrar error al usuario, solo usar lista vacía
+    depositos.value = []
+  }
+
   if (props.producto) {
     console.log('📝 Producto a editar:', props.producto)
     
@@ -301,6 +344,7 @@ onMounted(() => {
       tiene_vencimiento: !!props.producto.tiene_vencimiento,
       fecha_vencimiento: fechaVencimiento,
       ubicacion: props.producto.ubicacion || '',
+      deposito_id: props.producto.deposito_id || '',
       estado: props.producto.estado
     }
     
