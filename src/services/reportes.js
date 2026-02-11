@@ -48,6 +48,31 @@ export const reportesService = {
     return this.descargarReporte('stock-bajo', params, `stock_bajo_${Date.now()}.xlsx`)
   },
 
+  // Vale de Cargo PDF
+  async descargarValeCargo(movimientoId) {
+    try {
+      const response = await api.get(`/reportes/pdf/vale-cargo/${movimientoId}`, {
+        responseType: 'blob'
+      })
+
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `vale_cargo_${movimientoId}.pdf`)
+      
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      
+      window.URL.revokeObjectURL(url)
+      
+      return { success: true }
+    } catch (error) {
+      logger.error('Error descargando vale de cargo:', error)
+      throw error
+    }
+  },
+
   // 3. Reporte Próximos a Vencer
   async reporteProximosVencer(params = {}) {
     return this.descargarReporte('proximos-vencer', params, `proximos_vencer_${Date.now()}.xlsx`)

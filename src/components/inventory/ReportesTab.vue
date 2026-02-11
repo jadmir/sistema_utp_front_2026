@@ -18,12 +18,14 @@
             <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Inventario Completo</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Listado completo de todos los productos del inventario</p>
             <div class="space-y-2 mb-4 flex-grow">
-              <select v-model="filtrosGenerales.section_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
-                <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
+              <select v-model="filtrosGenerales.deposito_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
               </select>
               <select v-model="filtrosGenerales.stock_type_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todos los tipos</option>
+                <option value="">Todos los tipos de artículo</option>
                 <option v-for="tipo in stockTypes" :key="tipo.id" :value="tipo.id">{{ tipo.nombre }}</option>
               </select>
             </div>
@@ -51,13 +53,19 @@
             </div>
           </div>
 
-          <!-- Por Tipo de Stock -->
+          <!-- Por Tipo de Artículo -->
           <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition h-full flex flex-col bg-white dark:bg-gray-800">
-            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Por Tipo de Stock</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Productos agrupados por tipo de stock con subtotales</p>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Por Tipo de Artículo</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Productos agrupados por tipo de artículo con subtotales</p>
             <div class="space-y-2 mb-4 flex-grow">
+              <select v-model="filtrosTipoStock.deposito_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
+              </select>
               <select v-model="filtrosTipoStock.stock_type_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todos los tipos</option>
+                <option value="">Todos los tipos de artículo</option>
                 <option v-for="tipo in stockTypes" :key="tipo.id" :value="tipo.id">{{ tipo.nombre }}</option>
               </select>
             </div>
@@ -77,13 +85,19 @@
             </div>
           </div>
 
-          <!-- Por Sección -->
+          <!-- Por Categorías -->
           <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition h-full flex flex-col bg-white dark:bg-gray-800">
-            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Por Sección</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Productos agrupados por sección con resumen</p>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Por Categorías</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Productos agrupados por categoría con resumen</p>
             <div class="space-y-2 mb-4 flex-grow">
+              <select v-model="filtrosSeccion.deposito_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
+              </select>
               <select v-model="filtrosSeccion.section_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
+                <option value="">Todas las categorías</option>
                 <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
               </select>
             </div>
@@ -119,9 +133,11 @@
             <h4 class="font-semibold text-red-900 dark:text-red-300 mb-2">Stock Bajo</h4>
             <p class="text-sm text-red-700 dark:text-red-400 mb-4">Productos con stock actual ≤ stock mínimo</p>
             <div class="space-y-2 mb-4 flex-grow">
-              <select v-model="filtrosStockBajo.section_id" class="w-full px-3 py-2 border border-red-300 dark:border-red-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
-                <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
+              <select v-model="filtrosStockBajo.deposito_id" class="w-full px-3 py-2 border border-red-300 dark:border-red-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
               </select>
             </div>
             <div class="flex gap-2">
@@ -140,9 +156,11 @@
             <p class="text-sm text-orange-700 dark:text-orange-400 mb-4">Productos que vencen próximamente</p>
             <div class="space-y-2 mb-4 flex-grow">
               <input v-model.number="filtrosVencer.dias" type="number" min="1" max="365" placeholder="Días (default: 30)" class="w-full px-3 py-2 border border-orange-300 dark:border-orange-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white" />
-              <select v-model="filtrosVencer.section_id" class="w-full px-3 py-2 border border-orange-300 dark:border-orange-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
-                <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
+              <select v-model="filtrosVencer.deposito_id" class="w-full px-3 py-2 border border-orange-300 dark:border-orange-700 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
               </select>
             </div>
             <div class="flex gap-2">
@@ -160,9 +178,11 @@
             <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Productos Vencidos</h4>
             <p class="text-sm text-gray-700 dark:text-gray-400 mb-4">Productos con fecha de vencimiento pasada</p>
             <div class="space-y-2 mb-4 flex-grow">
-              <select v-model="filtrosVencidos.section_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
-                <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
+              <select v-model="filtrosVencidos.deposito_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
               </select>
             </div>
             <div class="flex gap-2">
@@ -199,9 +219,11 @@
               </select>
               <input v-model="filtrosMovimientos.fecha_desde" type="date" placeholder="Fecha desde" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
               <input v-model="filtrosMovimientos.fecha_hasta" type="date" placeholder="Fecha hasta" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
-              <select v-model="filtrosMovimientos.section_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                <option value="">Todas las secciones</option>
-                <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">{{ seccion.nombre }}</option>
+              <select v-model="filtrosMovimientos.deposito_id" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <option value="">Todos los depósitos</option>
+                <option v-for="deposito in depositos" :key="deposito.id" :value="deposito.id">
+                  {{ deposito.nombre }}
+                </option>
               </select>
             </div>
             <div class="flex gap-2">
@@ -249,6 +271,7 @@ import { reportesService } from '../../services/reportes'
 import { productsService } from '../../services/products'
 import { sectionsService } from '../../services/sections'
 import { stockTypesService } from '../../services/stockTypes'
+import { depositosService } from '../../services/depositos'
 import { useAlert } from '../../composables/useAlert'
 
 const { success, error } = useAlert()
@@ -257,15 +280,16 @@ const loading = ref(false)
 const productos = ref([])
 const sections = ref([])
 const stockTypes = ref([])
+const depositos = ref([])
 
 // Filtros para cada reporte
-const filtrosGenerales = ref({ section_id: '', stock_type_id: '' })
-const filtrosTipoStock = ref({ stock_type_id: '' })
-const filtrosSeccion = ref({ section_id: '' })
-const filtrosStockBajo = ref({ section_id: '' })
-const filtrosVencer = ref({ dias: 30, section_id: '' })
-const filtrosVencidos = ref({ section_id: '' })
-const filtrosMovimientos = ref({ tipo: '', fecha_desde: '', fecha_hasta: '', section_id: '' })
+const filtrosGenerales = ref({ stock_type_id: '', deposito_id: '' })
+const filtrosTipoStock = ref({ stock_type_id: '', deposito_id: '' })
+const filtrosSeccion = ref({ section_id: '', deposito_id: '' })
+const filtrosStockBajo = ref({ deposito_id: '' })
+const filtrosVencer = ref({ dias: 30, deposito_id: '' })
+const filtrosVencidos = ref({ deposito_id: '' })
+const filtrosMovimientos = ref({ tipo: '', fecha_desde: '', fecha_hasta: '', deposito_id: '' })
 const filtrosKardex = ref({ product_id: '', fecha_desde: '', fecha_hasta: '' })
 
 // Funciones para generar reportes
@@ -297,7 +321,7 @@ const generarReporteTipoStock = async () => {
   loading.value = true
   try {
     await reportesService.reporteTipoStock(filtrosTipoStock.value)
-    success('Reporte generado', 'El reporte por tipo de stock ha sido descargado')
+    success('Reporte generado', 'El reporte por tipo de artículo ha sido descargado')
   } catch (err) {
     error('Error al generar reporte', err.response?.data?.message || err.message)
   } finally {
@@ -309,7 +333,7 @@ const generarReporteTipoStockPDF = async () => {
   loading.value = true
   try {
     await reportesService.reporteTipoStockPDF(filtrosTipoStock.value)
-    success('Reporte PDF generado', 'El reporte por tipo de stock en PDF ha sido descargado')
+    success('Reporte PDF generado', 'El reporte por tipo de artículo en PDF ha sido descargado')
   } catch (err) {
     error('Error al generar reporte PDF', err.response?.data?.message || err.message)
   } finally {
@@ -321,7 +345,7 @@ const generarReporteSeccion = async () => {
   loading.value = true
   try {
     await reportesService.reporteSeccion(filtrosSeccion.value)
-    success('Reporte generado', 'El reporte por sección ha sido descargado')
+    success('Reporte generado', 'El reporte por categorías ha sido descargado')
   } catch (err) {
     error('Error al generar reporte', err.response?.data?.message || err.message)
   } finally {
@@ -333,7 +357,7 @@ const generarReporteSeccionPDF = async () => {
   loading.value = true
   try {
     await reportesService.reporteSeccionPDF(filtrosSeccion.value)
-    success('Reporte PDF generado', 'El reporte por sección en PDF ha sido descargado')
+    success('Reporte PDF generado', 'El reporte por categorías en PDF ha sido descargado')
   } catch (err) {
     error('Error al generar reporte PDF', err.response?.data?.message || err.message)
   } finally {
@@ -492,7 +516,7 @@ const loadSections = async () => {
     const response = await sectionsService.getAll()
     sections.value = response.data.data
   } catch (err) {
-    console.error('Error cargando secciones:', err)
+    console.error('Error cargando categorías:', err)
   }
 }
 
@@ -501,7 +525,16 @@ const loadStockTypes = async () => {
     const response = await stockTypesService.getAll()
     stockTypes.value = response.data.data
   } catch (err) {
-    console.error('Error cargando tipos de stock:', err)
+    console.error('Error cargando tipos de artículo:', err)
+  }
+}
+
+const loadDepositos = async () => {
+  try {
+    const response = await depositosService.getAll()
+    depositos.value = response.data.data
+  } catch (err) {
+    console.error('Error cargando depósitos:', err)
   }
 }
 
@@ -509,5 +542,6 @@ onMounted(() => {
   loadProductos()
   loadSections()
   loadStockTypes()
+  loadDepositos()
 })
 </script>

@@ -119,6 +119,72 @@
           ></textarea>
         </div>
 
+        <!-- Datos del Receptor (solo para SALIDAS - Vale de Cargo) -->
+        <div v-if="tipo === 'salida'" class="border-t border-gray-300 dark:border-gray-600 pt-4">
+          <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3 mb-4">
+            <p class="text-sm font-semibold text-orange-900 dark:text-orange-300 mb-1">📄 Vale de Cargo</p>
+            <p class="text-xs text-orange-700 dark:text-orange-400">
+              Se generará un vale de cargo que debe ser firmado por quien entrega y quien recibe.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Recibido por (Nombre completo) *
+            </label>
+            <input
+              v-model="form.recibido_por"
+              type="text"
+              required
+              maxlength="255"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              placeholder="Ej: Juan Pérez García"
+            />
+          </div>
+
+          <div class="mt-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              DNI del receptor *
+            </label>
+            <input
+              v-model="form.dni_receptor"
+              type="text"
+              required
+              maxlength="8"
+              pattern="\d{8}"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              placeholder="12345678"
+            />
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">8 dígitos numéricos</p>
+          </div>
+
+          <div class="mt-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Cargo del receptor *
+            </label>
+            <input
+              v-model="form.cargo_receptor"
+              type="text"
+              required
+              maxlength="100"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              placeholder="Ej: Jefe de Área, Coordinador, etc."
+            />
+          </div>
+
+          <div class="mt-3">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Observaciones del receptor
+            </label>
+            <textarea
+              v-model="form.observaciones_receptor"
+              rows="2"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+              placeholder="Ej: Material recibido en buen estado (opcional)"
+            ></textarea>
+          </div>
+        </div>
+
         <!-- Previsualización -->
         <div v-if="form.cantidad > 0" class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <p class="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Resultado esperado:</p>
@@ -169,6 +235,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { productsService } from '../../services/products'
 import { areasService } from '../../services/areas'
+import { valesCargoService } from '../../services/valesCargo'
 import { useAlert } from '../../composables/useAlert'
 import { useCache } from '../../composables/useCache'
 
@@ -201,7 +268,12 @@ const form = ref({
   motivo: '',
   observaciones: '',
   area_id: '',
-  fecha_movimiento: new Date().toISOString().split('T')[0] // Por defecto hoy
+  fecha_movimiento: new Date().toISOString().split('T')[0], // Por defecto hoy
+  // Campos del Vale de Cargo (solo para salidas)
+  recibido_por: '',
+  dni_receptor: '',
+  cargo_receptor: '',
+  observaciones_receptor: ''
 })
 
 const formatDate = (dateString) => {
@@ -259,19 +331,41 @@ const handleSubmit = async () => {
       fecha_movimiento: form.value.fecha_movimiento
     }
 
-    // Agregar area_id solo si es salida
+    // Agregar area_id y campos del vale de cargo solo si es salida
     if (props.tipo === 'salida') {
       data.area_id = parseInt(form.value.area_id)
+      data.recibido_por = form.value.recibido_por
+      data.dni_receptor = form.value.dni_receptor
+      data.cargo_receptor = form.value.cargo_receptor
+      data.observaciones_receptor = form.value.observaciones_receptor || undefined
     }
 
     console.log('📤 Enviando datos al backend:', data)
+
+    let movimientoId = null
+    let numeroVale = null
 
     if (props.tipo === 'entrada') {
       await productsService.registerEntry(props.producto.id, data)
       success('Entrada registrada', `Se agregaron ${data.cantidad} ${props.producto.unidad_medida}`)
     } else {
-      await productsService.registerExit(props.producto.id, data)
-      success('Salida registrada', `Se retiraron ${data.cantidad} ${props.producto.unidad_medida}`)
+      const response = await productsService.registerExit(props.producto.id, data)
+      movimientoId = response.data?.data?.movimiento_id
+      numeroVale = response.data?.data?.numero_vale
+      
+      if (numeroVale) {
+        success('Salida registrada', `Se retiraron ${data.cantidad} ${props.producto.unidad_medida}. Vale: ${numeroVale}`)
+        
+        // Auto-descargar el PDF del vale de cargo usando el nuevo servicio
+        try {
+          await valesCargoService.generarPDF(movimientoId)
+        } catch (pdfError) {
+          console.error('Error al descargar vale:', pdfError)
+          error('Vale generado pero no se pudo descargar', 'Puede descargarlo desde el historial de movimientos')
+        }
+      } else {
+        success('Salida registrada', `Se retiraron ${data.cantidad} ${props.producto.unidad_medida}`)
+      }
     }
     
     // Invalidar caché del dashboard y productos para forzar actualización

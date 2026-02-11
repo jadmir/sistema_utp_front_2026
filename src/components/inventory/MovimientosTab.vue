@@ -62,6 +62,7 @@
               <th class="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Stock</th>
               <th class="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Usuario</th>
               <th class="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Motivo</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
             </tr>
           </thead>
           <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -134,6 +135,18 @@
               <td class="hidden lg:table-cell px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                 {{ movimiento.motivo }}
               </td>
+              <td class="px-4 py-3 text-sm">
+                <!-- Botón de descarga de vale (solo para salidas con vale) -->
+                <button
+                  v-if="movimiento.tipo === 'SALIDA' && movimiento.numero_vale"
+                  @click="descargarVale(movimiento.id, movimiento.numero_vale)"
+                  class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium rounded transition"
+                  title="Descargar Vale de Cargo"
+                >
+                  📄 Vale
+                </button>
+                <span v-else class="text-gray-400 dark:text-gray-500 text-xs">-</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -168,10 +181,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { movementsService } from '../../services/movements'
 import { areasService } from '../../services/areas'
+import { valesCargoService } from '../../services/valesCargo'
 import SkeletonLoader from '../SkeletonLoader.vue'
 import { useAlert } from '../../composables/useAlert'
 
-const { error } = useAlert()
+const { success, error } = useAlert()
+const descargandoVale = ref(null)
 
 const movimientos = ref([])
 const loading = ref(false)
@@ -276,6 +291,22 @@ const clearFilters = () => {
     page: 1
   }
   loadMovimientos()
+}
+
+const descargarVale = async (movimientoId, numeroVale) => {
+  if (descargandoVale.value === movimientoId) return
+  
+  descargandoVale.value = movimientoId
+  try {
+    // Usar el nuevo endpoint que descarga el PDF guardado
+    await valesCargoService.descargar(movimientoId, numeroVale)
+    success('Vale descargado', `Vale ${numeroVale} descargado exitosamente`)
+  } catch (err) {
+    console.error('Error al descargar vale:', err)
+    error('Error al descargar vale', err.response?.data?.message || 'No se pudo descargar el vale de cargo')
+  } finally {
+    descargandoVale.value = null
+  }
 }
 
 const loadPage = (page) => {

@@ -59,5 +59,32 @@ export const productsService = {
   // Historial de movimientos de un producto
   getHistory(id) {
     return api.get(`/products/${id}/historial`)
+  },
+
+  // Descargar Vale de Cargo (PDF)
+  async descargarValeCargo(movimientoId) {
+    try {
+      const response = await api.get(`/reportes/pdf/vale-cargo/${movimientoId}`, {
+        responseType: 'blob'
+      })
+
+      // Crear URL del blob
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `vale_cargo_${movimientoId}.pdf`)
+      
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      
+      // Limpiar URL
+      window.URL.revokeObjectURL(url)
+      
+      return { success: true }
+    } catch (error) {
+      console.error('Error descargando vale de cargo:', error)
+      throw error
+    }
   }
 }
