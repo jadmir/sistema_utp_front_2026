@@ -6,11 +6,12 @@
     </div>
     
     <div class="w-full max-w-md px-6 relative z-10">
-      <!-- Encabezado rojo con icono -->
+      <!-- Encabezado rojo con logo -->
       <div class="bg-red-600 dark:bg-gray-800 rounded-t-2xl pt-8 pb-6 px-8 text-center shadow-lg">
-        <!-- Icono de caja -->
-        <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-4 flex items-center justify-center">
-          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Logo (si existe, sino muestra ícono) -->
+        <div class="w-32 h-32 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center p-3 shadow-lg">
+          <img v-if="logoUrl" :src="logoUrl" alt="Logo" class="w-full h-full object-contain" />
+          <svg v-else class="w-16 h-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
         </div>
@@ -140,6 +141,9 @@ import { useAlert } from '../composables/useAlert'
 
 const authStore = useAuthStore()
 const { error: showError } = useAlert()
+
+// Logo desde public/
+const logoUrl = '/logo_utp.jpg'
 
 const form = ref({
   email: '',

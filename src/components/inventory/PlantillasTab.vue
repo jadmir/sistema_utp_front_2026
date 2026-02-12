@@ -178,6 +178,7 @@
 
     <EjecutarPlantillaModal
       v-if="showEjecutarModal"
+      ref="ejecutarModalRef"
       :plantilla="selectedPlantilla"
       @close="closeEjecutarModal"
       @ejecutar="handleEjecutar"
@@ -205,6 +206,7 @@ const filters = ref({ area_id: '', activa: '' })
 const showModal = ref(false)
 const showEjecutarModal = ref(false)
 const selectedPlantilla = ref(null)
+const ejecutarModalRef = ref(null)
 
 const canCreate = computed(() => authStore.hasPermission('inventario.crear'))
 const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
@@ -281,6 +283,11 @@ const handleEjecutar = async (data) => {
   try {
     const response = await plantillasEntregasService.ejecutar(selectedPlantilla.value.id, data)
     
+    // Detener loading del modal
+    if (ejecutarModalRef.value) {
+      ejecutarModalRef.value.setLoading(false)
+    }
+    
     // Mostrar resultado
     const resultado = response.data
     success(`Plantilla ejecutada: ${resultado.total_procesados} productos procesados`)
@@ -302,17 +309,21 @@ const handleEjecutar = async (data) => {
     // Notificar al padre que hubo movimientos
     emit('movimiento-created')
   } catch (err) {
+    // Detener loading del modal
+    if (ejecutarModalRef.value) {
+      ejecutarModalRef.value.setLoading(false)
+    }
+    
     if (err.response?.data?.errores) {
-      // Errores de stock insuficiente
-      error('Stock insuficiente en algunos productos')
-      err.response.data.errores.forEach(errorItem => {
-        setTimeout(() => {
-          error(
-            `${errorItem.nombre} (${errorItem.codigo})`,
-            `Stock actual: ${errorItem.stock_actual}, Solicitado: ${errorItem.cantidad_solicitada}`
-          )
-        }, 200)
-      })
+      // Errores de stock insuficiente - mostrar en el modal
+      const errores = err.response.data.errores
+      if (ejecutarModalRef.value) {
+        ejecutarModalRef.value.setErroresStock(errores)
+      }
+      error(
+        'Stock insuficiente',
+        `${errores.length} producto(s) no tienen stock disponible. Revisa los detalles en el modal.`
+      )
     } else {
       error('Error al ejecutar plantilla', err.response?.data?.message || err.message)
     }

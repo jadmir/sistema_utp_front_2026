@@ -94,6 +94,33 @@
             </p>
           </div>
 
+          <!-- Alerta de errores de stock -->
+          <div v-if="erroresStock.length > 0" class="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-lg p-4 space-y-3">
+            <div class="flex items-start gap-3">
+              <svg class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="flex-1">
+                <p class="font-bold text-red-900 dark:text-red-200 text-sm">Stock insuficiente</p>
+                <p class="text-xs text-red-800 dark:text-red-300 mt-1">Los siguientes productos no tienen stock disponible:</p>
+              </div>
+            </div>
+            <div class="max-h-32 overflow-y-auto space-y-2 pl-9">
+              <div
+                v-for="(errorItem, index) in erroresStock"
+                :key="index"
+                class="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-800 rounded p-2 text-xs"
+              >
+                <p class="font-semibold text-gray-900 dark:text-white">{{ errorItem.nombre }}</p>
+                <p class="text-gray-600 dark:text-gray-400">Código: {{ errorItem.codigo }}</p>
+                <div class="flex justify-between mt-1">
+                  <span class="text-red-700 dark:text-red-400">Stock actual: <strong>{{ errorItem.stock_actual }}</strong></span>
+                  <span class="text-gray-700 dark:text-gray-300">Solicitado: <strong>{{ errorItem.cantidad_solicitada }}</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Advertencia -->
           <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 flex items-start gap-2">
             <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,12 +147,17 @@
             </button>
             <button
               type="submit"
-              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold flex items-center justify-center gap-2"
+              :disabled="loading"
+              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg v-if="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-              Ejecutar Plantilla
+              <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ loading ? 'Procesando...' : 'Ejecutar Plantilla' }}
             </button>
           </div>
         </form>
@@ -151,14 +183,29 @@ const form = ref({
   observaciones_generales: ''
 })
 
+const loading = ref(false)
+const erroresStock = ref([])
+
 const fechaMaxima = computed(() => {
   const hoy = new Date()
   return hoy.toISOString().split('T')[0]
 })
 
 const handleSubmit = () => {
+  loading.value = true
+  erroresStock.value = []
   emit('ejecutar', form.value)
 }
+
+const setLoading = (value) => {
+  loading.value = value
+}
+
+const setErroresStock = (errores) => {
+  erroresStock.value = errores
+}
+
+defineExpose({ setLoading, setErroresStock })
 
 onMounted(() => {
   // Por defecto, usar la fecha de hoy
