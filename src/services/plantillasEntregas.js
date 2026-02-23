@@ -1,7 +1,7 @@
 import api from './api'
 
 export const plantillasEntregasService = {
-  // Listar todas las plantillas
+  // Listar todas las plantillas (ya acepta params)
   getAll(params = {}) {
     return api.get('/plantillas-entregas', { params })
   },

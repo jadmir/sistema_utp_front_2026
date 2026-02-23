@@ -283,14 +283,18 @@ const loadAreas = async () => {
     if (filters.value.estado !== '') params.estado = filters.value.estado
 
     const response = await areasService.getAll(params)
-    areas.value = response.data.data
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    areas.value = paginationData.data || []
+    
     pagination.value = {
-      current_page: response.data.current_page,
-      last_page: response.data.last_page,
-      per_page: response.data.per_page,
-      total: response.data.total,
-      from: response.data.from,
-      to: response.data.to
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
     }
   } catch (err) {
     error('Error al cargar áreas', err.response?.data?.message || err.message)
@@ -334,7 +338,12 @@ const handleSave = () => {
 }
 
 const confirmDelete = async (area) => {
-  if (confirm(`¿Está seguro de eliminar el área "${area.nombre}"?\n\nEsto establecerá area_id en NULL para todos los movimientos asociados.`)) {
+  const confirmed = await confirm(
+    'Eliminar área',
+    `¿Está seguro de eliminar el área "${area.nombre}"?\n\nEsto establecerá area_id en NULL para todos los movimientos asociados.`
+  )
+  
+  if (confirmed) {
     try {
       await areasService.delete(area.id)
       success('Área eliminada', 'El área ha sido eliminada correctamente')

@@ -15,6 +15,8 @@ export const useAuthStore = defineStore('auth', () => {
   // Sistema de polling
   let pollingInterval = null
   const REFRESH_INTERVAL = 30000 // 30 segundos
+  let failedAttempts = 0
+  const MAX_FAILED_ATTEMPTS = 3
 
   async function login(credentials) {
     try {
@@ -91,6 +93,9 @@ export const useAuthStore = defineStore('auth', () => {
     // Limpiar polling anterior si existe
     stopPermissionPolling()
     
+    // Resetear contador de fallos al iniciar
+    failedAttempts = 0
+    
     // Ejecutar inmediatamente
     refreshPermissions()
     
@@ -121,6 +126,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.get('/auth/refresh-permissions')
       
       if (response.data) {
+        // ✅ Request exitoso, resetear contador de fallos
+        failedAttempts = 0
+        
         const oldPermissions = user.value?.permissions?.length || 0
         const newPermissions = response.data.user?.permissions?.length || 0
         
@@ -142,6 +150,9 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
     } catch (error) {
+      // Incrementar contador de fallos
+      failedAttempts++
+      
       if (error.response?.status === 403 && error.response?.data?.logout_required) {
         // Usuario desactivado
         logger.warn('⚠️ Usuario desactivado, cerrando sesión...')
@@ -151,7 +162,17 @@ export const useAuthStore = defineStore('auth', () => {
         logger.warn('⚠️ Token expirado, cerrando sesión...')
         forceLogout('Tu sesión ha expirado')
       } else {
-        logger.error('❌ Error al refrescar permisos:', error)
+        // Error de red u otro error
+        logger.error(`❌ Error al refrescar permisos (intento ${failedAttempts}/${MAX_FAILED_ATTEMPTS}):`, error.message)
+        
+        // Si se alcanza el máximo de intentos fallidos, detener polling
+        if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+          stopPermissionPolling()
+          logger.warn('⚠️ Polling detenido por múltiples fallos consecutivos. Se reanudará al cambiar de pestaña.')
+          
+          // Opcional: mostrar notificación al usuario
+          // showError('Conexión interrumpida', 'No se pueden actualizar permisos. Verifica tu conexión.')
+        }
       }
     }
   }

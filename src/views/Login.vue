@@ -90,9 +90,12 @@
               />
               <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Recordar sesión</span>
             </label>
-            <button type="button" @click.prevent="() => {}" aria-label="Recuperar contraseña" class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium">
+            <router-link 
+              to="/forgot-password" 
+              class="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:underline font-medium"
+            >
               ¿Olvidaste tu contraseña?
-            </button>
+            </router-link>
           </div>
 
           <!-- Error message -->

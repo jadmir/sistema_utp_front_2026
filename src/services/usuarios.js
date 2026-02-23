@@ -2,8 +2,8 @@ import api from './api'
 
 export const usuariosService = {
   // Listar usuarios
-  getAll() {
-    return api.get('/usuarios')
+  getAll(params = {}) {
+    return api.get('/usuarios', { params })
   },
 
   // Obtener usuario por ID
@@ -27,8 +27,8 @@ export const usuariosService = {
   },
 
   // Obtener usuarios eliminados
-  getTrashed() {
-    return api.get('/usuarios-eliminados')
+  getTrashed(params = {}) {
+    return api.get('/usuarios-eliminados', { params })
   },
 
   // Restaurar usuario

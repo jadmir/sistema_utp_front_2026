@@ -1,12 +1,14 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 overflow-y-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-2 sm:my-8 max-h-[95vh] flex flex-col">
-      <div 
-        :class="[
-          'border-b dark:border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-lg flex-shrink-0',
-          tipo === 'entrada' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-orange-50 dark:bg-orange-900/20'
-        ]"
-      >
+  <div class="fixed inset-0 z-50 bg-black bg-opacity-50">
+    <div class="fixed inset-0 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-2 sm:my-8">
+          <div 
+            :class="[
+              'border-b dark:border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-lg',
+              tipo === 'entrada' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-orange-50 dark:bg-orange-900/20'
+            ]"
+          >
         <h2 class="text-base sm:text-xl font-bold text-gray-900 dark:text-white">
           {{ tipo === 'entrada' ? '📥 Entrada de Stock' : '📤 Salida de Stock' }}
         </h2>
@@ -17,7 +19,7 @@
         </button>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto">
+      <form @submit.prevent="handleSubmit" class="max-h-[65vh] overflow-y-auto">
         <div class="p-6 space-y-4">
         <!-- Info del producto -->
         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -227,6 +229,8 @@
           </button>
         </div>
       </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>

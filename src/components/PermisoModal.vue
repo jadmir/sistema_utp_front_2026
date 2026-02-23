@@ -7,13 +7,12 @@
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4 py-8">
-        <div class="fixed inset-0 transition-opacity bg-black bg-opacity-50 dark:bg-opacity-70" @click="closeModal"></div>
-
-        <div class="relative inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl max-h-[90vh] flex flex-col">
-          <!-- Header -->
-          <div class="flex justify-between items-center p-6 pb-4 border-b dark:border-gray-700 flex-shrink-0">
+    <div v-if="show" class="fixed inset-0 z-50 bg-black bg-opacity-50 dark:bg-opacity-70" @click="closeModal">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div @click.stop class="relative inline-block w-full max-w-lg my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 pb-4 border-b dark:border-gray-700">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ isEditMode ? 'Editar Permiso' : 'Nuevo Permiso' }}
             </h3>
@@ -22,11 +21,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-          </div>
+            </div>
 
-          <!-- Content -->
-          <div class="flex-1 overflow-y-auto">
-          <!-- Form -->
+            <!-- Content -->
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
+              <!-- Form -->
           <form @submit.prevent="handleSubmit" id="permiso-form" class="p-6 space-y-4">
             <!-- Módulo -->
             <div>
@@ -81,7 +80,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="flex-shrink-0 flex justify-end space-x-3 p-6 pt-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <div class="flex justify-end space-x-3 p-6 pt-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <button
                 type="button"
                 @click="closeModal"
@@ -101,6 +100,7 @@
                 </svg>
                 <span>{{ loading ? 'Guardando...' : 'Guardar' }}</span>
               </button>
+            </div>
           </div>
         </div>
       </div>

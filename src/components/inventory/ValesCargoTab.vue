@@ -378,9 +378,11 @@ const buscarVales = async () => {
     }
     
     const response = await valesCargoService.listar(params)
-    vales.value = response.data.data.data || response.data.data || []
     
-    const paginationData = response.data.data || response.data
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    vales.value = paginationData.data || []
+    
     pagination.value = {
       current_page: paginationData.current_page || 1,
       per_page: paginationData.per_page || 15,

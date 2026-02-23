@@ -505,7 +505,8 @@ const generarReporteKardexPDF = async () => {
 const loadProductos = async () => {
   try {
     const response = await productsService.getAll({ per_page: 1000 })
-    productos.value = response.data.data.data || []
+    const paginationData = response.data.data
+    productos.value = paginationData.data || []
   } catch (err) {
     console.error('Error cargando productos:', err)
   }
@@ -514,7 +515,8 @@ const loadProductos = async () => {
 const loadSections = async () => {
   try {
     const response = await sectionsService.getAll()
-    sections.value = response.data.data
+    const paginationData = response.data.data
+    sections.value = paginationData.data || []
   } catch (err) {
     console.error('Error cargando categorías:', err)
   }
@@ -523,7 +525,8 @@ const loadSections = async () => {
 const loadStockTypes = async () => {
   try {
     const response = await stockTypesService.getAll()
-    stockTypes.value = response.data.data
+    const paginationData = response.data.data
+    stockTypes.value = paginationData.data || []
   } catch (err) {
     console.error('Error cargando tipos de artículo:', err)
   }
@@ -532,7 +535,8 @@ const loadStockTypes = async () => {
 const loadDepositos = async () => {
   try {
     const response = await depositosService.getAll()
-    depositos.value = response.data.data
+    const paginationData = response.data.data
+    depositos.value = paginationData.data || []
   } catch (err) {
     console.error('Error cargando depósitos:', err)
   }

@@ -177,6 +177,28 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Paginación -->
+      <div v-if="pagination.total > pagination.per_page" class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <p class="text-sm text-gray-700 dark:text-gray-400">
+          Mostrando {{ pagination.from }} a {{ pagination.to }} de {{ pagination.total }} usuarios
+        </p>
+        <div class="flex gap-2">
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 rounded text-sm font-medium transition',
+              page === pagination.current_page
+                ? 'bg-red-600 text-white'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+            ]"
+          >
+            {{ page }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Crear/Editar -->
@@ -219,8 +241,28 @@ const showModal = ref(false)
 const selectedUsuario = ref(null)
 const showPermisosModal = ref(false)
 const selectedUsuarioPermisos = ref(null)
+const pagination = ref({
+  current_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  last_page: 1
+})
 
 const isAdmin = computed(() => authStore.user?.rol === 'Admin')
+
+const visiblePages = computed(() => {
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  const pages = []
+  
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  
+  return pages
+})
 
 const filteredUsuarios = computed(() => {
   if (!searchQuery.value) return usuarios.value
@@ -232,13 +274,27 @@ const filteredUsuarios = computed(() => {
   )
 })
 
-const loadUsuarios = async () => {
+const loadUsuarios = async (page = 1) => {
   loading.value = true
   try {
+    const params = { page, per_page: pagination.value.per_page }
     const response = showDeleted.value 
-      ? await usuariosService.getTrashed()
-      : await usuariosService.getAll()
-    usuarios.value = response.data.data
+      ? await usuariosService.getTrashed(params)
+      : await usuariosService.getAll(params)
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    usuarios.value = paginationData.data || []
+    
+    // Actualizar paginación
+    pagination.value = {
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
+    }
   } catch (err) {
     console.error('Error cargando usuarios:', err)
     
@@ -256,27 +312,65 @@ const loadUsuarios = async () => {
   }
 }
 
+const changePage = (page) => {
+  pagination.value.current_page = page
+  loadUsuarios(page)
+}
+
 const loadRoles = async () => {
   try {
     const response = await rolesService.getAll()
-    roles.value = response.data.data
+    let rolesData = []
+    
+    // Extraer el array de roles de la respuesta
+    if (response.data.data && Array.isArray(response.data.data.data)) {
+      rolesData = response.data.data.data
+    } else if (Array.isArray(response.data.data)) {
+      rolesData = response.data.data
+    } else if (Array.isArray(response.data)) {
+      rolesData = response.data
+    }
+    
+    // Eliminar duplicados por NOMBRE (no por ID)
+    const rolesMap = new Map()
+    rolesData.forEach(rol => {
+      if (rol && rol.id && rol.nombre) {
+        const nombreKey = rol.nombre.toLowerCase()
+        // Solo agregar si no existe o si el ID es menor (usar el primero)
+        if (!rolesMap.has(nombreKey)) {
+          rolesMap.set(nombreKey, rol)
+        }
+      }
+    })
+    
+    roles.value = Array.from(rolesMap.values())
   } catch (err) {
     error('Error al cargar roles', err.response?.data?.message || err.message)
+    roles.value = []
   }
 }
 
 const toggleDeletedView = () => {
   showDeleted.value = !showDeleted.value
-  loadUsuarios()
+  pagination.value.current_page = 1
+  loadUsuarios(1)
 }
 
-const openCreateModal = () => {
+const openCreateModal = async () => {
   selectedUsuario.value = null
+  // Asegurarse de que los roles estén cargados antes de abrir el modal
+  if (roles.value.length === 0) {
+    await loadRoles()
+  }
   showModal.value = true
 }
 
-const openEditModal = (usuario) => {
+const openEditModal = async (usuario) => {
   selectedUsuario.value = { ...usuario }
+  // Asegurarse de que los roles estén cargados antes de abrir el modal
+  if (roles.value.length === 0) {
+    await loadRoles()
+  }
   showModal.value = true
 }
 

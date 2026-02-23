@@ -7,12 +7,12 @@
     leave-from-class="opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div class="fixed inset-0 transition-opacity bg-black bg-opacity-50 dark:bg-opacity-70" @click="closeModal"></div>
-
-      <div class="relative inline-block w-full max-w-2xl text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl max-h-[90vh] flex flex-col">
-          <!-- Header -->
-          <div class="flex justify-between items-center px-6 py-5 border-b dark:border-gray-700 flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+    <div v-if="show" class="fixed inset-0 z-50 bg-black bg-opacity-50 dark:bg-opacity-70" @click="closeModal">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div @click.stop class="relative inline-block w-full max-w-2xl text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl my-8">
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-5 border-b dark:border-gray-700 bg-gray-100 dark:bg-gray-700">
             <div>
               <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Asignar Permisos</h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Rol: {{ rol?.nombre }}</p>
@@ -24,8 +24,8 @@
             </button>
           </div>
 
-          <!-- Content -->
-          <div class="flex-1 overflow-y-auto p-6">
+            <!-- Content -->
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
           <!-- Loading -->
           <div v-if="loading" class="flex justify-center py-12">
             <svg class="animate-spin h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24">
@@ -95,7 +95,9 @@
               </button>
             </div>
           </div>
+          </div>
         </div>
+      </div>
     </div>
   </transition>
 </template>

@@ -131,6 +131,7 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { permisosService } from '../services/permisos'
 import { useAlert } from '../composables/useAlert'
+import { logger } from '../utils/logger'
 // Lazy loading de modal para mejorar performance
 const PermisoModal = defineAsyncComponent(() => import('../components/PermisoModal.vue'))
 
@@ -150,7 +151,9 @@ const isAdmin = computed(() => authStore.user?.rol === 'Admin')
 // Obtener lista única de módulos
 const modulos = computed(() => {
   if (!Array.isArray(permisos.value)) return []
-  const mods = permisos.value.map(p => p.modulo || 'Otros')
+  const mods = permisos.value
+    .filter(p => p !== null && p !== undefined)
+    .map(p => p.modulo || 'Otros')
   return [...new Set(mods)].sort()
 })
 
@@ -158,7 +161,7 @@ const modulos = computed(() => {
 const permisosFiltrados = computed(() => {
   if (!Array.isArray(permisos.value)) return []
   
-  let filtered = permisos.value
+  let filtered = permisos.value.filter(p => p !== null && p !== undefined)
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
@@ -195,7 +198,15 @@ const loadPermisos = async () => {
   loading.value = true
   try {
     const response = await permisosService.getAll()
-    const permisosData = response.data || response
+    logger.log('📋 RESPUESTA PERMISOS:', response)
+    
+    // Estructura Laravel: response.data puede contener los permisos
+    let permisosData = response.data || response
+    
+    // Si viene paginado
+    if (permisosData.data) {
+      permisosData = permisosData.data
+    }
     
     // El backend devuelve los permisos agrupados: { "Usuarios": [...], "Roles": [...] }
     // Convertir a array plano
@@ -206,9 +217,11 @@ const loadPermisos = async () => {
     } else {
       permisos.value = []
     }
+    
+    logger.log('✅ PERMISOS CARGADOS:', permisos.value.length)
   } catch (error) {
     showAlert('Error al cargar permisos', 'error')
-    console.error('Error:', error)
+    logger.error('❌ Error cargando permisos:', error)
     permisos.value = []
   } finally {
     loading.value = false
@@ -244,7 +257,7 @@ const handleSubmit = async (formData) => {
     await loadPermisos()
   } catch (error) {
     showAlert(error.response?.data?.message || 'Error al guardar permiso', 'error')
-    console.error('Error:', error)
+    logger.error('Error:', error)
   }
 }
 
@@ -259,7 +272,7 @@ const deletePermiso = async (permiso) => {
     await loadPermisos()
   } catch (error) {
     showAlert(error.response?.data?.message || 'Error al eliminar permiso', 'error')
-    console.error('Error:', error)
+    logger.error('Error:', error)
   }
 }
 

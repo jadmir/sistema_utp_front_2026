@@ -106,16 +106,47 @@ const tipos = ref([])
 const loading = ref(false)
 const showModal = ref(false)
 const selectedTipo = ref(null)
+const pagination = ref({
+  current_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  last_page: 1
+})
 
 const canCreate = computed(() => authStore.hasPermission('inventario.crear'))
 const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
 const canDelete = computed(() => authStore.hasPermission('inventario.eliminar'))
 
-const loadTipos = async () => {
+const visiblePages = computed(() => {
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  const pages = []
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const loadTipos = async (page = 1) => {
   loading.value = true
   try {
-    const response = await stockTypesService.getAll()
-    tipos.value = response.data.data.data || response.data.data || []
+    const params = { page, per_page: pagination.value.per_page }
+    const response = await stockTypesService.getAll(params)
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    tipos.value = paginationData.data || []
+    
+    pagination.value = {
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
+    }
   } catch (err) {
     error('Error al cargar tipos', err.response?.data?.message || err.message)
   } finally {
@@ -141,6 +172,11 @@ const closeModal = () => {
 const handleSave = async () => {
   closeModal()
   await loadTipos()
+}
+
+const changePage = (page) => {
+  pagination.value.current_page = page
+  loadTipos(page)
 }
 
 const deleteTipo = async (tipo) => {

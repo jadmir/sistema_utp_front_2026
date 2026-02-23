@@ -2,8 +2,8 @@ import api from './api'
 
 export const stockTypesService = {
   // Listar todos los tipos de stock
-  getAll() {
-    return api.get('/stock-types')
+  getAll(params = {}) {
+    return api.get('/stock-types', { params })
   },
 
   // Obtener tipo de stock específico

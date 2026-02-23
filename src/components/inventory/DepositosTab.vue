@@ -134,30 +134,67 @@ const loading = ref(false)
 const filters = ref({ activo: '' })
 const showModal = ref(false)
 const selectedDeposito = ref(null)
+const pagination = ref({
+  current_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  last_page: 1
+})
 
 const canCreate = computed(() => authStore.hasPermission('inventario.crear'))
 const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
 const canDelete = computed(() => authStore.hasPermission('inventario.eliminar'))
 
-const loadDepositos = async () => {
+const visiblePages = computed(() => {
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  const pages = []
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const loadDepositos = async (page = 1) => {
   loading.value = true
   try {
-    const params = {}
+    const params = {
+      page,
+      per_page: pagination.value.per_page
+    }
     if (filters.value.activo !== '') {
       params.activo = filters.value.activo
     }
     const response = await depositosService.getAll(params)
-    depositos.value = response.data.data || []
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    depositos.value = paginationData.data || []
+    
+    pagination.value = {
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
+    }
   } catch (err) {
     console.warn('⚠️ Error al cargar depósitos:', err.message)
     depositos.value = []
-    // No mostrar error si el backend no tiene el endpoint implementado
     if (!err.response || err.response.status !== 404) {
       error('Error al cargar depósitos', err.response?.data?.message || err.message)
     }
   } finally {
     loading.value = false
   }
+}
+
+const changePage = (page) => {
+  pagination.value.current_page = page
+  loadDepositos(page)
 }
 
 const openCreateModal = () => {

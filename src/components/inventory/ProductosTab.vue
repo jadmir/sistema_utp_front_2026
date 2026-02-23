@@ -27,7 +27,7 @@
         class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
       >
         <option value="">Todos los tipos</option>
-        <option v-for="tipo in stockTypes" :key="tipo.id" :value="tipo.id">
+        <option v-for="tipo in filteredStockTypes" :key="tipo.id" :value="tipo.id">
           {{ tipo.nombre }}
         </option>
       </select>
@@ -37,7 +37,7 @@
         class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
       >
         <option value="">Todas las secciones</option>
-        <option v-for="seccion in sections" :key="seccion.id" :value="seccion.id">
+        <option v-for="seccion in filteredSections" :key="seccion.id" :value="seccion.id">
           {{ seccion.nombre }}
         </option>
       </select>
@@ -414,6 +414,7 @@ import { sectionsService } from '../../services/sections'
 import { depositosService } from '../../services/depositos'
 import { useAlert } from '../../composables/useAlert'
 import { useCache } from '../../composables/useCache'
+import storage from '../../utils/storage'
 import ProductoModal from './ProductoModal.vue'
 import MovimientoModal from './MovimientoModal.vue'
 import HistorialModal from './HistorialModal.vue'
@@ -434,8 +435,8 @@ const loading = ref(false)
 const searchQuery = ref('')
 
 // Intentar restaurar filtros guardados
-const savedFilters = localStorage.getItem('productos_filters')
-const filters = ref(savedFilters ? JSON.parse(savedFilters) : {
+const savedFilters = storage.getItemJSON('productos_filters')
+const filters = ref(savedFilters || {
   stock_type_id: '',
   section_id: '',
   stock_bajo: false,
@@ -472,6 +473,10 @@ const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
 const canDelete = computed(() => authStore.hasPermission('inventario.eliminar'))
 const canEntry = computed(() => authStore.hasPermission('inventario.entrada'))
 const canExit = computed(() => authStore.hasPermission('inventario.salida'))
+
+// Filtrar arrays para eliminar nulls/undefined
+const filteredStockTypes = computed(() => stockTypes.value.filter(t => t !== null && t !== undefined))
+const filteredSections = computed(() => sections.value.filter(s => s !== null && s !== undefined))
 
 const visiblePages = computed(() => {
   const current = pagination.value.current_page
@@ -645,7 +650,8 @@ const loadProductos = async (forceRefresh = false) => {
 const loadStockTypes = async () => {
   try {
     const response = await stockTypesService.getAll()
-    stockTypes.value = response.data.data
+    const paginationData = response.data.data
+    stockTypes.value = paginationData.data || []
   } catch (err) {
     console.warn('⚠️ No se pudieron cargar tipos de stock:', err.message)
     stockTypes.value = [] // Continuar con array vacío
@@ -655,7 +661,8 @@ const loadStockTypes = async () => {
 const loadSections = async () => {
   try {
     const response = await sectionsService.getAll()
-    sections.value = response.data.data
+    const paginationData = response.data.data
+    sections.value = paginationData.data || []
   } catch (err) {
     console.warn('⚠️ No se pudieron cargar secciones:', err.message)
     sections.value = [] // Continuar con array vacío
@@ -665,7 +672,8 @@ const loadSections = async () => {
 const loadDepositos = async () => {
   try {
     const response = await depositosService.getAll()
-    depositos.value = response.data.data || []
+    const paginationData = response.data.data
+    depositos.value = paginationData.data || []
     console.log('🏢 DEPÓSITOS CARGADOS:', depositos.value.length)
   } catch (err) {
     console.warn('⚠️ No se pudieron cargar depósitos:', err.message)
@@ -911,7 +919,7 @@ onMounted(async () => {
 
 // Guardar filtros cuando cambien
 watch(filters, (newFilters) => {
-  localStorage.setItem('productos_filters', JSON.stringify(newFilters))
+  storage.setItemJSON('productos_filters', newFilters)
 }, { deep: true })
 
 onBeforeUnmount(() => {

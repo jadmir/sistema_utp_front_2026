@@ -1,9 +1,8 @@
 <template>
-  <div class="fixed inset-0 z-[100] overflow-y-auto" @click.self="$emit('close')">
-    <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 py-4">
-      <div class="fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75" @click="$emit('close')"></div>
-
-      <div class="relative inline-block bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full max-w-2xl z-[101]">
+  <div class="fixed inset-0 z-[100] bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75" @click="$emit('close')">
+    <div class="fixed inset-0 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center px-2 sm:px-4 py-4">
+        <div @click.stop class="relative inline-block bg-white dark:bg-gray-800 rounded-lg text-left shadow-xl transform transition-all w-full max-w-2xl my-4">
         <!-- Header -->
         <div class="bg-gradient-to-r from-green-600 to-green-700 px-4 sm:px-6 py-4">
           <div class="flex items-center justify-between">
@@ -161,6 +160,7 @@
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   </div>

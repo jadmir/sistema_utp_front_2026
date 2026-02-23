@@ -124,19 +124,51 @@ const loading = ref(false)
 const filters = ref({ stock_type_id: '' })
 const showModal = ref(false)
 const selectedSeccion = ref(null)
+const pagination = ref({
+  current_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  last_page: 1
+})
 
 const canCreate = computed(() => authStore.hasPermission('inventario.crear'))
 const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
 const canDelete = computed(() => authStore.hasPermission('inventario.eliminar'))
 
-const loadSecciones = async () => {
+const visiblePages = computed(() => {
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  const pages = []
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const loadSecciones = async (page = 1) => {
   loading.value = true
   try {
     const params = {
+      page,
+      per_page: pagination.value.per_page,
       stock_type_id: filters.value.stock_type_id || undefined
     }
     const response = await sectionsService.getAll(params)
-    secciones.value = response.data.data.data || response.data.data || []
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    secciones.value = paginationData.data || []
+    
+    pagination.value = {
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
+    }
   } catch (err) {
     error('Error al cargar secciones', err.response?.data?.message || err.message)
   } finally {
@@ -144,10 +176,16 @@ const loadSecciones = async () => {
   }
 }
 
+const changePage = (page) => {
+  pagination.value.current_page = page
+  loadSecciones(page)
+}
+
 const loadStockTypes = async () => {
   try {
     const response = await stockTypesService.getAll()
-    stockTypes.value = response.data.data.data || response.data.data || []
+    const paginationData = response.data.data
+    stockTypes.value = paginationData.data || []
   } catch (err) {
     console.error('Error cargando tipos de stock:', err)
   }

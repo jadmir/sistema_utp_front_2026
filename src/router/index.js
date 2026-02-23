@@ -10,6 +10,18 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('../views/ForgotPassword.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../views/ResetPassword.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/cambiar-password',
     name: 'CambiarPassword',
     component: () => import('../views/CambiarPassword.vue'),
@@ -54,54 +66,79 @@ const router = createRouter({
 
 // Guard de navegación
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  const requiresAuth = to.meta.requiresAuth
-  const requiredRoles = to.meta.roles
-  const requiredPermission = to.meta.permission
+  try {
+    const authStore = useAuthStore()
+    
+    // Verificar que authStore esté inicializado correctamente
+    if (!authStore) {
+      logger.error('❌ AuthStore no disponible, redirigiendo a login')
+      next('/login')
+      return
+    }
+    
+    const requiresAuth = to.meta.requiresAuth
+    const requiredRoles = to.meta.roles
+    const requiredPermission = to.meta.permission
 
-  if (requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
-  } else if (to.path === '/login' && authStore.isAuthenticated) {
-    next('/')
-  } else if (requiredRoles || requiredPermission) {
-    const user = authStore.user
-    const userRole = user?.rol || user?.role?.nombre
-    
-    // Obtener permisos del rol
-    const rolePermissions = user?.role?.permissions || []
-    // Obtener permisos individuales del usuario
-    const userPermissions = user?.permissions || []
-    // Combinar permisos
-    const allPermissions = [...rolePermissions, ...userPermissions]
-    
-    logger.log('🔐 Verificando acceso a:', to.path)
-    logger.log('🔐 Rol del usuario:', userRole)
-    logger.log('🔐 Permisos totales:', allPermissions.map(p => p.slug))
-    logger.log('🔐 Permiso requerido:', requiredPermission)
-    logger.log('🔐 Roles requeridos:', requiredRoles)
-    
-    // Verificar si tiene el permiso requerido (PRIORIDAD)
-    let hasPermission = false
-    if (requiredPermission) {
-      hasPermission = allPermissions.some(p => p.slug === requiredPermission)
-    }
-    
-    // Verificar si tiene el rol requerido
-    const hasRole = requiredRoles ? requiredRoles.includes(userRole) : false
-    
-    logger.log('🔐 Tiene permiso?', hasPermission)
-    logger.log('🔐 Tiene rol?', hasRole)
-    
-    // Permitir acceso si tiene el permiso O el rol
-    if (hasPermission || hasRole) {
-      next()
-    } else {
-      // No tiene acceso
-      logger.log('❌ Acceso denegado')
+    if (requiresAuth && !authStore.isAuthenticated) {
+      next('/login')
+    } else if (to.path === '/login' && authStore.isAuthenticated) {
       next('/')
+    } else if (requiredRoles || requiredPermission) {
+      const user = authStore.user
+      
+      // Verificar que el usuario exista
+      if (!user) {
+        logger.warn('⚠️ Usuario no disponible, redirigiendo a login')
+        next('/login')
+        return
+      }
+      
+      const userRole = user?.rol || user?.role?.nombre
+      
+      // Obtener permisos del rol
+      const rolePermissions = user?.role?.permissions || []
+      // Obtener permisos individuales del usuario
+      const userPermissions = user?.permissions || []
+      // Combinar permisos
+      const allPermissions = [...rolePermissions, ...userPermissions]
+      
+      logger.log('🔐 Verificando acceso a:', to.path)
+      logger.log('🔐 Rol del usuario:', userRole)
+      logger.log('🔐 Permisos totales:', allPermissions.map(p => p.slug))
+      logger.log('🔐 Permiso requerido:', requiredPermission)
+      logger.log('🔐 Roles requeridos:', requiredRoles)
+      
+      // Verificar si tiene el permiso requerido (PRIORIDAD)
+      let hasPermission = false
+      if (requiredPermission) {
+        hasPermission = allPermissions.some(p => p.slug === requiredPermission)
+      }
+      
+      // Verificar si tiene el rol requerido
+      const hasRole = requiredRoles ? requiredRoles.includes(userRole) : false
+      
+      logger.log('🔐 Tiene permiso?', hasPermission)
+      logger.log('🔐 Tiene rol?', hasRole)
+      
+      // Permitir acceso si tiene el permiso O el rol
+      if (hasPermission || hasRole) {
+        next()
+      } else {
+        // No tiene acceso
+        logger.log('❌ Acceso denegado')
+        next('/')
+      }
+    } else {
+      next()
     }
-  } else {
-    next()
+  } catch (error) {
+    // Manejo de errores críticos en la navegación
+    logger.error('❌ Error crítico en router guard:', error)
+    console.error('Router guard error:', error)
+    
+    // Redirigir a login en caso de error
+    next('/login')
   }
 })
 

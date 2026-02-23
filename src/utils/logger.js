@@ -1,6 +1,10 @@
 /**
  * Sistema de logging condicional
  * Solo muestra logs en modo desarrollo
+ * En producción, los logs se suprimen para:
+ * - Mejor performance
+ * - No exponer información sensible
+ * - Consola limpia para usuarios finales
  */
 
 const isDevelopment = import.meta.env.DEV

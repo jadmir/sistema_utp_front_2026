@@ -119,6 +119,7 @@ const ReportesTab = defineAsyncComponent(() => import('../components/inventory/R
 const PlantillasTab = defineAsyncComponent(() => import('../components/inventory/PlantillasTab.vue'))
 import { usePermissions } from '../composables/usePermissions'
 import { logger } from '../utils/logger'
+import storage from '../utils/storage'
 
 const activeTab = ref('productos')
 const stockAlerts = ref(0)
@@ -228,7 +229,7 @@ const loadStockAlerts = async () => {
     const response = await productsService.getStockAlerts()
     stockAlerts.value = response.data.total || 0
   } catch (error) {
-    console.error('Error cargando alertas:', error)
+    logger.error('Error cargando alertas:', error)
   }
 }
 
@@ -253,7 +254,7 @@ onMounted(() => {
   loadStockAlerts()
   
   // Restaurar tab guardado si existe
-  const savedTab = localStorage.getItem('inventario_activeTab')
+  const savedTab = storage.getItem('inventario_activeTab')
   if (savedTab && tabs.value.find(t => t.id === savedTab)) {
     activeTab.value = savedTab
   }
@@ -261,6 +262,6 @@ onMounted(() => {
 
 // Guardar tab activo cuando cambia
 watch(activeTab, (newTab) => {
-  localStorage.setItem('inventario_activeTab', newTab)
+  storage.setItem('inventario_activeTab', newTab)
 })
 </script>

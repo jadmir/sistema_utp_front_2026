@@ -206,6 +206,24 @@ const filters = ref({ area_id: '', activa: '' })
 const showModal = ref(false)
 const showEjecutarModal = ref(false)
 const selectedPlantilla = ref(null)
+const pagination = ref({
+  current_page: 1,
+  per_page: 20,
+  total: 0,
+  from: 0,
+  to: 0,
+  last_page: 1
+})
+
+const visiblePages = computed(() => {
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  const pages = []
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  return pages
+})
 const ejecutarModalRef = ref(null)
 
 const canCreate = computed(() => authStore.hasPermission('inventario.crear'))
@@ -213,15 +231,29 @@ const canEdit = computed(() => authStore.hasPermission('inventario.editar'))
 const canDelete = computed(() => authStore.hasPermission('inventario.eliminar'))
 const canExecute = computed(() => authStore.hasPermission('inventario.salida'))
 
-const loadPlantillas = async () => {
+const loadPlantillas = async (page = 1) => {
   loading.value = true
   try {
     const params = {
+      page,
+      per_page: pagination.value.per_page,
       area_id: filters.value.area_id || undefined,
       activa: filters.value.activa || undefined
     }
     const response = await plantillasEntregasService.getAll(params)
-    plantillas.value = response.data.data || []
+    
+    // Estructura Laravel: response.data.data contiene metadatos de paginación
+    const paginationData = response.data.data
+    plantillas.value = paginationData.data || []
+    
+    pagination.value = {
+      current_page: paginationData.current_page || 1,
+      per_page: paginationData.per_page || 20,
+      total: paginationData.total || 0,
+      from: paginationData.from || 0,
+      to: paginationData.to || 0,
+      last_page: paginationData.last_page || 1
+    }
   } catch (err) {
     error('Error al cargar plantillas', err.response?.data?.message || err.message)
   } finally {
@@ -229,10 +261,16 @@ const loadPlantillas = async () => {
   }
 }
 
+const changePage = (page) => {
+  pagination.value.current_page = page
+  loadPlantillas(page)
+}
+
 const loadAreas = async () => {
   try {
     const response = await areasService.getAll()
-    areas.value = response.data.data.data || response.data.data || []
+    const paginationData = response.data.data
+    areas.value = paginationData.data || []
   } catch (err) {
     error('Error al cargar áreas', err.response?.data?.message || err.message)
   }

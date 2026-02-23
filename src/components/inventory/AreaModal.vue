@@ -1,23 +1,22 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto" @click="closeModal">
-    <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 py-4 sm:py-8">
-      <div class="fixed inset-0 bg-black opacity-50 dark:opacity-70"></div>
-      
-      <div @click.stop class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[95vh] flex flex-col my-2 sm:my-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center p-3 sm:p-6 pb-3 sm:pb-4 border-b dark:border-gray-700 flex-shrink-0">
-          <h3 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-            {{ isEdit ? 'Editar Área' : 'Nueva Área' }}
-          </h3>
-          <button @click="closeModal" aria-label="Cerrar modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+  <div v-if="isOpen" class="fixed inset-0 z-50 bg-black bg-opacity-50 dark:bg-opacity-70" @click="closeModal">
+    <div class="fixed inset-0 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
+        <div @click.stop class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-2 sm:my-8">
+          <!-- Header -->
+          <div class="flex justify-between items-center p-3 sm:p-6 pb-3 sm:pb-4 border-b dark:border-gray-700">
+            <h3 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
+              {{ isEdit ? 'Editar Área' : 'Nueva Área' }}
+            </h3>
+            <button @click="closeModal" aria-label="Cerrar modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-        <!-- Content -->
-        <div class="flex-1 overflow-y-auto p-6">
+          <!-- Content -->
+          <div class="p-6 max-h-[65vh] overflow-y-auto">
         <!-- Error Message -->
         <div v-if="errorMessage" class="mb-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
           {{ errorMessage }}
@@ -122,6 +121,7 @@
           >
             {{ saving ? 'Guardando...' : (isEdit ? 'Actualizar' : 'Crear') }}
           </button>
+        </div>
         </div>
       </div>
     </div>

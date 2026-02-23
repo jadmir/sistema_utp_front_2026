@@ -37,8 +37,11 @@ const confirmDialog = ref(null)
 const { setAlertInstance, setConfirmInstance } = useAlert()
 const { initTheme } = useTheme()
 
+// Rutas públicas que no requieren el MainLayout
+const publicRoutes = ['/login', '/cambiar-password', '/forgot-password', '/reset-password']
+
 const isLoginPage = computed(() => {
-  return route.path === '/login' || route.path === '/cambiar-password'
+  return publicRoutes.includes(route.path)
 })
 
 onMounted(() => {

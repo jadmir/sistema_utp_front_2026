@@ -1,7 +1,9 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50 p-2 sm:p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full max-h-[95vh] flex flex-col my-2 sm:my-8">
-      <div class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-lg flex-shrink-0">
+  <div class="fixed inset-0 z-50 bg-black bg-opacity-50 dark:bg-opacity-70">
+    <div class="fixed inset-0 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-2 sm:p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full my-2 sm:my-8">
+          <div class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-lg">
         <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
           {{ tipo ? 'Editar Categoría' : 'Nueva Categoría' }}
         </h2>
@@ -12,7 +14,7 @@
         </button>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto">
+      <form @submit.prevent="handleSubmit" class="max-h-[65vh] overflow-y-auto">
         <div class="p-6 space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre *</label>
@@ -75,6 +77,8 @@
           </button>
         </div>
       </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>

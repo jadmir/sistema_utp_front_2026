@@ -2,12 +2,13 @@ import { ref } from 'vue'
 import { logger } from '../utils/logger'
 
 /**
- * Sistema de caché en memoria con TTL (Time To Live)
+ * Sistema de caché en memoria con TTL (Time To Live) y límite de tamaño
  * Evita solicitudes redundantes al servidor
  */
 
 // Store global de caché (compartido entre componentes)
 const cache = new Map()
+const MAX_CACHE_SIZE = 100 // Límite máximo de entradas en caché
 
 /**
  * Composable para manejar caché de datos
@@ -77,6 +78,14 @@ export function useCache(defaultTTL = 120000) {
       logger.log(`🌐 Obteniendo del servidor: ${key}`)
       const data = await fetchFunction(params)
 
+      // Verificar límite de caché antes de guardar
+      if (cache.size >= MAX_CACHE_SIZE) {
+        // Eliminar la entrada más antigua (LRU simple)
+        const firstKey = cache.keys().next().value
+        cache.delete(firstKey)
+        logger.log(`🗑️ Caché lleno, eliminada entrada más antigua: ${firstKey}`)
+      }
+
       // Guardar en caché
       cache.set(cacheKey, {
         data,
@@ -84,7 +93,7 @@ export function useCache(defaultTTL = 120000) {
         ttl
       })
 
-      logger.log(`💾 Guardado en caché: ${key}`)
+      logger.log(`💾 Guardado en caché: ${key} (${cache.size}/${MAX_CACHE_SIZE})`)
       return data
     } finally {
       loading.value = false
