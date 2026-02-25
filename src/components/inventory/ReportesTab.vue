@@ -514,7 +514,7 @@ const loadProductos = async () => {
 
 const loadSections = async () => {
   try {
-    const response = await sectionsService.getAll()
+    const response = await sectionsService.getAll({ per_page: 1000 })
     const paginationData = response.data.data
     sections.value = paginationData.data || []
   } catch (err) {
@@ -524,7 +524,7 @@ const loadSections = async () => {
 
 const loadStockTypes = async () => {
   try {
-    const response = await stockTypesService.getAll()
+    const response = await stockTypesService.getAll({ per_page: 1000 })
     const paginationData = response.data.data
     stockTypes.value = paginationData.data || []
   } catch (err) {
@@ -534,7 +534,7 @@ const loadStockTypes = async () => {
 
 const loadDepositos = async () => {
   try {
-    const response = await depositosService.getAll()
+    const response = await depositosService.getAll({ per_page: 1000 })
     const paginationData = response.data.data
     depositos.value = paginationData.data || []
   } catch (err) {

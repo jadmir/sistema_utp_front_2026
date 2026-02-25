@@ -268,7 +268,7 @@ const changePage = (page) => {
 
 const loadAreas = async () => {
   try {
-    const response = await areasService.getAll()
+    const response = await areasService.getAll({ per_page: 1000 })
     const paginationData = response.data.data
     areas.value = paginationData.data || []
   } catch (err) {

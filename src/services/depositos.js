@@ -9,13 +9,13 @@ export const depositosService = {
   // Obtener depósitos activos (para selects)
   async getActivos() {
     try {
-      // Intentar endpoint específico primero
-      return await api.get('/depositos/activos')
+      // Intentar endpoint específico primero con límite alto
+      return await api.get('/depositos/activos', { params: { per_page: 1000 } })
     } catch (error) {
       // Si falla, usar endpoint principal con filtro o devolver array vacío
       console.warn('⚠️ Endpoint /depositos/activos no disponible, usando fallback')
       try {
-        return await api.get('/depositos', { params: { activo: 1 } })
+        return await api.get('/depositos', { params: { activo: 1, per_page: 1000 } })
       } catch (fallbackError) {
         console.warn('⚠️ Fallback de depósitos también falló, devolviendo array vacío')
         return { data: { data: [] } }

@@ -183,7 +183,7 @@ const changePage = (page) => {
 
 const loadStockTypes = async () => {
   try {
-    const response = await stockTypesService.getAll()
+    const response = await stockTypesService.getAll({ per_page: 1000 })
     const paginationData = response.data.data
     stockTypes.value = paginationData.data || []
   } catch (err) {
